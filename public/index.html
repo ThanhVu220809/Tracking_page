@@ -1,0 +1,100 @@
+﻿<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BA.SEW Tracking</title>
+  <meta name="description" content="BA.SEW Web Tracking - Theo dõi thiết bị theo thời gian thực, lịch sử di chuyển và vùng an toàn trên bản đồ trực tiếp." />
+  <meta name="theme-color" content="#6B4F3A" />
+  <meta property="og:title" content="BA.SEW Tracking" />
+  <meta property="og:description" content="Theo dõi thiết bị theo thời gian thực với giao diện rõ ràng, hiện đại và tối ưu cho desktop lẫn mobile." />
+  <meta property="og:type" content="website" />
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: "Be Vietnam Pro", "Segoe UI", sans-serif;
+      background: #f7f3ee;
+    }
+
+    #root {
+      min-height: 100%;
+    }
+
+    #boot-status {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #2b211b;
+      background: #f7f3ee;
+      z-index: 999999;
+    }
+
+    #boot-status__card {
+      width: min(680px, 100%);
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #e7ded2;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(74, 52, 38, 0.12);
+    }
+
+    #boot-status__title {
+      margin: 0 0 8px;
+      font-size: 20px;
+      color: #4a3426;
+    }
+
+    #boot-status__text {
+      margin: 0;
+      color: #6e5a4a;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    body[data-app-mounted="true"] #boot-status {
+      display: none;
+    }
+  </style>
+  <script>
+    window.addEventListener("error", function (event) {
+      var text = document.getElementById("boot-status__text");
+      if (text) {
+        text.textContent =
+          "Lỗi JavaScript trước khi giao diện render:\n" +
+          (event.message || "Lỗi không xác định");
+      }
+    });
+
+    window.addEventListener("unhandledrejection", function (event) {
+      var text = document.getElementById("boot-status__text");
+      if (text) {
+        var message =
+          event.reason && event.reason.message
+            ? event.reason.message
+            : String(event.reason);
+        text.textContent =
+          "Promise bị reject trước khi giao diện render:\n" + message;
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div id="boot-status">
+    <div id="boot-status__card">
+      <h1 id="boot-status__title">BA.SEW Tracking đang khởi động</h1>
+      <p id="boot-status__text">
+        Nếu thông báo này không tự ẩn, có thể bundle chưa mount được hoặc đã có lỗi trước khi React render.
+      </p>
+    </div>
+  </div>
+  <div id="root"></div>
+</body>
+
+</html>
