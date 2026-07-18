@@ -1,126 +1,124 @@
 # BA.SEW Tracking Map
 
-**Web map realtime theo dõi thiết bị SOS/GPS BA.SEW** — mở trình duyệt là xem vị trí, không cần cài app.
+### Theo dõi GPS realtime trên trình duyệt — không cần cài app
 
 <p align="center">
   <a href="https://thanhvu220809.github.io/Tracking_page/">
-    <img alt="Live" src="https://img.shields.io/badge/Live-thanhvu220809.github.io-2ea44f?style=for-the-badge&logo=githubpages&logoColor=white" />
+    <img src="https://img.shields.io/badge/🟢_Live_Map-Open_now-22c55e?style=for-the-badge&logo=githubpages&logoColor=white" alt="Live" />
   </a>
-  <img alt="Leaflet" src="https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white" />
-  <img alt="React" src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
-  <img alt="OpenStreetMap" src="https://img.shields.io/badge/OpenStreetMap-7EBC6F?style=for-the-badge&logo=openstreetmap&logoColor=white" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white" alt="Leaflet" />
+  <img src="https://img.shields.io/badge/OpenStreetMap-7EBC6F?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="OSM" />
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
 </p>
 
 <p align="center">
-  <strong><a href="https://thanhvu220809.github.io/Tracking_page/">→ Mở bản đồ live</a></strong>
+  <strong><a href="https://thanhvu220809.github.io/Tracking_page/">→ Mở bản đồ production</a></strong>
 </p>
 
 ---
 
-## Đây là gì?
+## ✨ Một dòng
 
-Repo này là **bản production build** của webtool theo dõi GPS — static files deploy lên GitHub Pages.
-
-Người thân / admin mở link → thấy:
-
-- Danh sách thiết bị online/offline
-- Marker vị trí hiện tại trên **Leaflet + OpenStreetMap**
-- Lịch sử di chuyển / route
-- Trạng thái geofence (trong/ngoài vùng an toàn)
-- Đổi tên thiết bị, lọc khoảng thời gian lịch sử
-
-Firmware ESP32 POST toạ độ lên backend; map này **poll / đọc API** và vẽ.
+Web map cho thiết bị **BA.SEW SOS/GPS**: xem vị trí hiện tại, lịch sử di chuyển, trạng thái online & geofence — mở link là dùng, zero install.
 
 ---
 
-## Chỗ đứng trong hệ sinh thái BA.SEW
+## 🗺️ Người dùng thấy gì
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### Thiết bị
+- Danh sách máy, online / offline  
+- Đổi tên hiển thị  
+- Last fix, tốc độ, số vệ tinh  
+- Nguồn định vị & độ chính xác  
+
+</td>
+<td width="50%" valign="top">
+
+### Bản đồ
+- Marker vị trí realtime  
+- Trail / lịch sử theo khung giờ  
+- Geofence: trong / ngoài vùng nhà  
+- Tile **OpenStreetMap** mượt  
+
+</td>
+</tr>
+</table>
+
+### UX tin cậy
+Nếu JS lỗi trước khi app mount → **màn hình trạng thái boot** giải thích lỗi (không trang trắng).
+
+---
+
+## 🏗️ Công nghệ
 
 ```text
-┌─────────────────┐     HTTP POST /update      ┌──────────────────────┐
-│  ESP32-S3       │ ─────────────────────────► │  Cloudflare Worker   │
-│  GPS + 4G/WiFi  │                            │  hoặc selfhost-relay │
-│  SOS button     │ ◄──── config / portal ──── │  (KV / JSON store)   │
-└─────────────────┘                            └──────────┬───────────┘
-                                                          │
-                     GET /api/devices · /api/location     │
-                     GET /api/history · rename            │
-                                                          ▼
-                                               ┌──────────────────────┐
-                                               │  Tracking_page       │
-                                               │  (repo này · Pages)  │
-                                               │  Leaflet map UI      │
-                                               └──────────────────────┘
-                                                          ▲
-                                                          │ deep-link
-                                               ┌──────────────────────┐
-                                               │  Landing_page        │
-                                               │  section “Trải nghiệm”│
-                                               └──────────────────────┘
+┌──────────────────┐         ┌───────────────────┐         ┌──────────────────┐
+│  ESP32 tracker   │  POST   │  Edge backend     │   GET   │  Tracking Map    │
+│  GPS + 4G/WiFi   │ ──────► │  Worker / relay   │ ──────► │  (repo này)      │
+│  SOS device      │         │  store last+hist  │         │  Leaflet · React │
+└──────────────────┘         └───────────────────┘         └──────────────────┘
 ```
 
-| Repo | Vai trò |
-|---|---|
-| [`esp32_sim_neo10`](https://github.com/ThanhVu220809/esp32_sim_neo10) | Firmware + Worker + **source webtool** |
-| [`Landing_page`](https://github.com/ThanhVu220809/Landing_page) | Landing bán hàng, link sang map này |
-| **Tracking_page (here)** | Host tĩnh map production |
+| Tầng | Công nghệ |
+|------|-----------|
+| Map | **Leaflet** · OpenStreetMap tiles |
+| UI | React · panel thiết bị · route modes |
+| Hosting | **GitHub Pages** (static, zero server cost) |
+| Data API | Cloudflare Workers **hoặc** self-host relay |
+| Thiết bị | ESP32-S3 firmware (repo riêng) |
 
-Source React của map nằm trong firmware monorepo:  
-`esp32_sim_neo10/webtool/` — repo này chỉ giữ **artifact deploy** để Pages phục vụ nhanh, ổn định.
+### API surface (backend)
 
----
-
-## API mà map đang nói chuyện
-
-Backend (Worker / relay) expose:
-
-| Method | Path | Mục đích |
-|---|---|---|
-| `GET` | `/api/devices` | Danh sách thiết bị + last fix |
-| `GET` | `/api/location?deviceId=` | Vị trí hiện tại 1 máy |
-| `GET` | `/api/history?deviceId=&from=&to=&limit=` | Trail lịch sử |
-| `POST` | `/api/device/rename` | Đổi tên hiển thị |
-| `POST` | `/update` | Firmware đẩy điểm GPS (không gọi từ UI) |
-
-Payload thiết bị gồm: lat/lng, timestamp, satellites, speed, nguồn định vị, geofence home/radius/inside, online age…
+| | Việc |
+|--|------|
+| Danh sách thiết bị | Last position + metadata |
+| Vị trí 1 máy | Fix hiện tại |
+| Lịch sử | Trail theo `from` / `to` / limit |
+| Đổi tên | Rename hiển thị |
+| Ingest (firmware) | `POST` điểm GPS từ field |
 
 ---
 
-## UX đáng chú ý
+## 🔗 Hệ sinh thái
 
-- **Boot status card** — nếu JS lỗi trước khi React mount, user vẫn thấy lý do (không màn hình trắng)
-- Map tiles OSM · marker custom · panel thiết bị
-- Phù hợp demo “không cần app” trên mobile browser
-
----
-
-## Deploy
-
-GitHub Pages, source: branch `main` (static root).
+| Project | Vai trò |
+|---------|---------|
+| **[esp32_sim_neo10](https://github.com/ThanhVu220809/esp32_sim_neo10)** | Firmware + backend + source webtool |
+| **[Landing_page](https://github.com/ThanhVu220809/Landing_page)** | Landing bán hàng · deep-link sang map |
+| **Tracking_page (here)** | Host production map cho end-user |
 
 ```text
-https://thanhvu220809.github.io/Tracking_page/
-```
-
-Khi rebuild từ `esp32_sim_neo10/webtool`:
-
-```bash
-cd webtool
-npm ci
-# TRACKER_API_BASE=https://your-worker.example.com
-npm run build
-# copy dist/* → repo Tracking_page → push
+  Landing  ──“Trải nghiệm”──►  Tracking Map  ◄──API──  Cloud
+                                    ▲
+                              ESP32 field devices
 ```
 
 ---
 
-## Bảo mật / vận hành (ghi chú)
+## 🚀 Production
 
-- API base URL được bake vào bundle lúc build — rotate Worker URL thì cần rebuild
-- Không commit secret; Worker dùng Cloudflare KV / token riêng phía edge
-- Pages chỉ host static — zero server cost cho frontend
+| | |
+|--|--|
+| **URL** | [thanhvu220809.github.io/Tracking_page](https://thanhvu220809.github.io/Tracking_page/) |
+| **Loại** | Static SPA trên GitHub Pages |
+| **Chi phí FE** | $0 hosting |
+| **Bí mật** | Không embed service key — chỉ public API base |
+
+---
+
+## 💡 Vì sao tách repo map?
+
+- Deploy Pages **nhanh & ổn** (artifact tĩnh)  
+- Landing / firmware ship độc lập  
+- Người thân chỉ cần **một URL** — không App Store, không login bắt buộc phía UI  
 
 ---
 
 <p align="center">
-  Open the map · watch the device · <strong>no app install</strong>
+  <sub>Open the map · watch the device · <strong>no app install</strong></sub>
 </p>
